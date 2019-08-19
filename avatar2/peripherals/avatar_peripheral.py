@@ -18,7 +18,7 @@ class AvatarPeripheral(object):
 
     def write_memory(self, address, size, value):
         offset = address - self.address
-        intervals = self.write_handler[offset:offset + size - 1]
+        intervals = self.write_handler[offset:offset + size]
         if intervals == set():
             raise Exception("No write handler for peripheral %s at offset %d \
                             (0x%x)" % (self.name, offset,
@@ -30,7 +30,7 @@ class AvatarPeripheral(object):
 
     def read_memory(self, address, size):
         offset = address - self.address
-        intervals = self.read_handler[offset:offset + size - 1]
+        intervals = self.read_handler[offset:offset + size]
         if intervals == set():
             raise Exception("No read handler for peripheral %s at offset %d \
                             (0x%x)" % (self.name, offset,
