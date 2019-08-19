@@ -41,6 +41,8 @@ class QemuTarget(Target):
 
         self.gdb_port = gdb_port
         self.gdb_additional_args = gdb_additional_args if gdb_additional_args else []
+        self.gdb = None
+        self.qmp = None
 
         self.qmp_port = qmp_port
 
@@ -172,11 +174,11 @@ class QemuTarget(Target):
         self.log.debug("QEMU command line: %s" % ' '.join(cmd_line))
         self.log.info("QEMU process running")
 
-        gdb = GDBProtocol(gdb_executable=self.gdb_executable,
+        self.gdb = GDBProtocol(gdb_executable=self.gdb_executable,
                           arch=self.avatar.arch,
                           additional_args=self.gdb_additional_args,
                           avatar=self.avatar, origin=self)
-        qmp = QMPProtocol(self.qmp_port, origin=self)  # TODO: Implement QMP
+        self.qmp = QMPProtocol(self.qmp_port, origin=self)  # TODO: Implement QMP
 
         if 'avatar-rmemory' in [i[2].qemu_name for i in
                                 self._memory_mapping.iter() if
@@ -187,11 +189,11 @@ class QemuTarget(Target):
         else:
             rmp = None
 
-        self.protocols.set_all(gdb)
-        self.protocols.monitor = qmp
+        self.protocols.set_all(self.gdb)
+        self.protocols.monitor = self.qmp
         self.protocols.remote_memory = rmp
 
-        if gdb.remote_connect(port=self.gdb_port) and qmp.connect():
+        if self.gdb.remote_connect(port=self.gdb_port) and self.qmp.connect():
             self.log.info("Connected to remote target")
         else:
             self.log.warning("Connection to remote target failed")
