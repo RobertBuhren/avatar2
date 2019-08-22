@@ -9,13 +9,12 @@ then
 fi
 
 cd `dirname "$BASH_SOURCE"`/src/
-git submodule update --init avatar-qemu 
+git clone -b fix_glibc27_build --depth 1 git@github.com:RobertBuhren/avatar-qemu.git
 
 cd avatar-qemu
-git submodule update --init dtc
 
 mkdir -p ../../build/qemu/
 cd ../../build/qemu
-../../src/avatar-qemu/configure --disable-sdl --target-list=arm-softmmu
+../../src/avatar-qemu/configure --disable-sdl --target-list=arm-softmmu --enable-trace-backends=simple
 make -j4
 
